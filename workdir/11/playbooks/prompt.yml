@@ -1,0 +1,11 @@
+---
+- hosts: web
+  become: True
+  tasks:
+    - name: "Deploy bash_profile file"
+      copy:
+        src: "bash_profile"
+        dest: "/home/ansible/.bash_profile"
+        owner: ansible
+        group: ansible
+...

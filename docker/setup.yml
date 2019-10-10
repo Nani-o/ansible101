@@ -1,0 +1,141 @@
+---
+- hosts: localhost
+  vars:
+    private_key: |
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
+      NhAAAAAwEAAQAAAQEAzk8zgXZJV+JQNbFkPPsFohicJKZqUdFNI7/eY8Z3HYnrJACf8lbM
+      gJwFTm7OPUKBhiMZA9/h+MV0QxT5x+F57pFP+N5W+WgJM35SINYuPMYGbm/WWwUF7OxCR6
+      pjvVL0vTNovCVdNvFb1vicBiBV1NUdDc7M7cy9ivWIgRcpSQ8nEqidC+mc/hVu0H6Jc+23
+      9IWhP7kKbctop/YQjD+ajsmIi9XJFLvp1drVykfjTk+yE9qQGCOt2QIqhKws2M0GGx/ejt
+      wi+yPSm30F3oAGjG8RMQVkZs8I7QXjNSab7Ozyr3LpDJFqMIL9A+S98sJGLgDAltWVsOZE
+      sdS0+1XuDwAAA8jpF5Kw6ReSsAAAAAdzc2gtcnNhAAABAQDOTzOBdklX4lA1sWQ8+wWiGJ
+      wkpmpR0U0jv95jxncdieskAJ/yVsyAnAVObs49QoGGIxkD3+H4xXRDFPnH4XnukU/43lb5
+      aAkzflIg1i48xgZub9ZbBQXs7EJHqmO9UvS9M2i8JV028VvW+JwGIFXU1R0NzsztzL2K9Y
+      iBFylJDycSqJ0L6Zz+FW7Qfolz7bf0haE/uQpty2in9hCMP5qOyYiL1ckUu+nV2tXKR+NO
+      T7IT2pAYI63ZAiqErCzYzQYbH96O3CL7I9KbfQXegAaMbxExBWRmzwjtBeM1Jpvs7PKvcu
+      kMkWowgv0D5L3ywkYuAMCW1ZWw5kSx1LT7Ve4PAAAAAwEAAQAAAQBCWzkOv9PxP2pbCrZZ
+      4sc6Dr5SD3CM5kvwXqsR3mi7iHun9cd8M6zNBOG0C3GsRHLSiQFnvJ+62w988Acy4fPM5t
+      IZErJYv7yN4mhaBWmTxIGXDcOdPO1d+dOLp2MzJrZvEFT0hvQHUvQeHZJZahcRQIZ6xXQm
+      XD7urfB8zM1LoM52BHXds1voqa1rjUDhAYFCqhQSJPy8tHgC6IzrQlDU2Ge67UPLfFadKJ
+      hX0ZmyC1ZE44dipGxFspdNqNc+y5aDuG8XJmaY+RqlZigb40lFbL6kKGuKtHisYd4Rpw67
+      KKnPb/gLNOeogGVEw9xAfoJsIAxxLLke3M3uqRXJHjOpAAAAgDd+83+3HoLWMDCMg6UAAN
+      149jlBIBoNdCk50jPzbAeRY1tmWZ0itVA2e74A27WrcPSa8IZjWuSpyVMKN1DSQ4T9Gcy4
+      1qkuU85uWHEwSBm1+DLkhBsujGrxabEapvkjBtgSglHZX0EmcLL4BHb4vOfL2fFbuY2ah3
+      q8Z9smCnHoAAAAgQD9/cIo1jFti8XYvP0tZdw54SqfSZaFiTwsgz9ri0D21ctPMlExitoZ
+      UMpGrsuMxgfi/gzl2S/dtXOpJQcXlIR9D7A5bcvQFQngmKh/jnDcduLHLxljGpLo91klMO
+      EWjBohFHyJk9hd5vcPVuyc/zhh2Yjb53YD7y/kWeZjbRGIuwAAAIEAz/DnbUwpChndi7CK
+      mLcL14g1YuYBf7Xx//MCmaOAUgwGK/+fTT1kgN5D/40KR7IbVLYnSkzMvoolNcTuPpNZEq
+      EVtxWOguDbwasvAmIjVb+J1cVa5xyzMyysBS3H6jnVfbIc8F5xMF1RUgnKUYB7V+2xg3Bj
+      cKF4CiVx4K36NL0AAAARTmFuaV9vQE5hcnVzZWdhd2EBAg==
+      -----END OPENSSH PRIVATE KEY-----
+    public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOTzOBdklX4lA1sWQ8+wWiGJwkpmpR0U0jv95jxncdieskAJ/yVsyAnAVObs49QoGGIxkD3+H4xXRDFPnH4XnukU/43lb5aAkzflIg1i48xgZub9ZbBQXs7EJHqmO9UvS9M2i8JV028VvW+JwGIFXU1R0NzsztzL2K9YiBFylJDycSqJ0L6Zz+FW7Qfolz7bf0haE/uQpty2in9hCMP5qOyYiL1ckUu+nV2tXKR+NOT7IT2pAYI63ZAiqErCzYzQYbH96O3CL7I9KbfQXegAaMbxExBWRmzwjtBeM1Jpvs7PKvcukMkWowgv0D5L3ywkYuAMCW1ZWw5kSx1LT7Ve4P
+  tasks:
+    - name: "Create ansible user"
+      user:
+        name: "ansible"
+        shell: "/bin/bash"
+        home: "/home/ansible"
+
+    - name: "Create .ssh folder"
+      file:
+        path: "/home/ansible/.ssh"
+        state: directory
+        mode: 0700
+
+    - name: "Add ansible private key"
+      copy:
+        content: "{{ item.content }}"
+        dest: "/home/ansible/.ssh/{{ item.file }}"
+        mode: 0600
+        owner: "ansible"
+        group: "ansible"
+      when: "image == 'controller'"
+      with_items:
+        - content: "{{ private_key }}"
+          file: id_rsa
+        - content: "{{ public_key }}"
+          file: id_rsa.pub
+
+    - name: "Add pubkey to authorized file"
+      authorized_key:
+        user: ansible
+        state: present
+        key: "{{ public_key }}"
+
+    - name: "Install openssh server"
+      apt:
+        name:
+          - openssh-server
+          - nano
+          - vim
+          - joe
+          - ed
+        update_cache: True
+
+    - name: "Make sure ssh is started"
+      service:
+        name: ssh
+        state: started
+        enabled: yes
+
+    # - name: "Clone fzf"
+    #   git:
+    #     repo: https://github.com/junegunn/fzf.git
+    #     depth: 1
+    #     dest: "/home/ansible/.fzf"
+    #   become: yes
+    #   become_user: ansible
+
+    # - name: "Install fzf"
+    #   shell: /home/ansible/.fzf/install
+    #   become: yes
+    #   become_user: ansible
+
+    - name: "Move lab folder to ansible home"
+      shell: "{{ item }}"
+      when: "image == 'controller'"
+      with_items:
+        - "mv /tmp/labs /home/ansible/.labs"
+        - "mv /tmp/workdir /home/ansible/workdir"
+
+    - name: "Chown folder"
+      file:
+        path: "{{ item }}"
+        owner: ansible
+        group: ansible
+        recurse: yes
+      with_items:
+        - "/home/ansible/.labs"
+        - "/home/ansible/workdir"
+      when: "image == 'controller'"
+
+    - name: "Source our bash profile"
+      lineinfile:
+        line: "source $HOME/.labs/ansible101.vars"
+        path: "/home/ansible/.profile"
+        insertafter: EOF
+      when: "image == 'controller'"
+
+    - name: "Create mdless folder"
+      file:
+        path: "/home/ansible/.config/mdless"
+        state: directory
+        recurse: yes
+        owner: ansible
+        group: ansible
+      when: "image == 'controller'"
+
+    - name: "Link mdless theme"
+      file:
+        src: "/home/ansible/.labs/mdless.theme"
+        dest: "/home/ansible/.config/mdless/mdless.theme"
+        state: link
+      when: "image == 'controller'"
+
+    - name: "Add possibility for ansible tu sudo without password"
+      lineinfile:
+        line: "ansible ALL = (ALL) NOPASSWD: ALL"
+        regexp: "^ansible .*"
+        path: /etc/sudoers
+...

@@ -1,0 +1,109 @@
+#!/bin/bash
+
+STATE_FILE="${HOME}/.lab_state"
+EXERCISE_LIST_FILE="${HOME}/.lab_list"
+SETUP_FOLDER="${HOME}/.labs/setup"
+CHECK_FOLDER="${HOME}/.labs/checks"
+EXERCISE_FOLDER="${HOME}/.labs/exercises"
+WORKDIR_FOLDER="${HOME}/workdir"
+MY_PATH="$(cd $(dirname $BASH_SOURCE) && pwd)"
+
+function show_exercise {
+    mdless --no-pager "${EXERCISE_FOLDER}/$CURRENT_EXERCISE-"*.md | grep -v -e 'div' -e 'href="./'
+}
+
+function next_exercise {
+    EXERCISE_TO_LOAD=$(echo "$EXERCISES_LIST" | grep -A1 -e "^${CURRENT_EXERCISE} -" | tail -1 | cut -d ' ' -f1)
+    load_exercise "${EXERCISE_TO_LOAD}"
+}
+
+function prev_exercise {
+    EXERCISE_TO_LOAD=$(echo "$EXERCISES_LIST" | grep -B1 -e "^${CURRENT_EXERCISE} -" | head -1 | cut -d ' ' -f1)
+    load_exercise "${EXERCISE_TO_LOAD}"
+}
+
+function load_exercise {
+    EXERCISE="$1"
+    # Backup current folder to current exercise original folder
+    cp -rf "${WORKDIR_FOLDER}/current/"* "${WORKDIR_FOLDER}/${CURRENT_EXERCISE}/" >/dev/null 2>&1
+
+    [[ -f "${SETUP_FOLDER}/${CURRENT_EXERCISE}-end.yml" ]] \
+        && ansible-playbook "${SETUP_FOLDER}/${CURRENT_EXERCISE}-end.yml" -i "${SETUP_FOLDER}/inventory" >/dev/null 2>&1
+
+    # Make new exercise the current one
+    CURRENT_EXERCISE="${EXERCISE}"
+    # Update state file
+    echo "${CURRENT_EXERCISE}" > "${STATE_FILE}"
+    # Clean our workdir
+    rm -rf "${WORKDIR_FOLDER}/current/"*
+    # Copy the new exercise files
+    cp -rf "${WORKDIR_FOLDER}/${CURRENT_EXERCISE}/"* "${WORKDIR_FOLDER}/current/" >/dev/null 2>&1
+    # Show the exercise
+    show_exercise
+    [[ -f "${SETUP_FOLDER}/${CURRENT_EXERCISE}-start.yml" ]] \
+        && ansible-playbook "${SETUP_FOLDER}/${CURRENT_EXERCISE}-start.yml" -i "${SETUP_FOLDER}/inventory" >/dev/null 2>&1
+}
+
+function check_exercise {
+    [[ -f "${CHECK_FOLDER}/${CURRENT_EXERCISE}-check.sh" ]] && "${CHECK_FOLDER}/${CURRENT_EXERCISE}-check.sh"
+}
+
+function show_help {
+    echo "Description:
+  Ce script permet de charger un exercice et l'environement associé
+
+Usage:
+  lab [command]
+
+Available Commands:
+  [lab_number]         Charge le lab passé en argument
+  help                 Affiche cette aide
+  check                Effectue la validation de l'exercice en cours
+  status               Affiche le status et l'énoncé si un exercice est en cours
+  next                 Charge l'exercice suivant
+  prev                 Charge l'exercice précédent
+  list                 Affiche la liste des exercices"
+}
+
+if [[ ! -f "$STATE_FILE" ]]; then
+    echo "00" > "$STATE_FILE"
+fi
+
+CURRENT_EXERCISE="$(cat $STATE_FILE)"
+
+if [[ ! -f "$EXERCISE_LIST_FILE" ]]; then
+    EXERCISES_LIST=$(find ~/.labs/exercises/ -maxdepth 1 -name *.md \
+               | xargs -L 1 \
+                       -I {} \
+                       sh -c 'mdless -l {} | grep -E " - " | cut -d " " -f4-' \
+               | sed -e 's/\x1b\[[0-9;]*m//g' \
+                     -e 's/^[ \t]*//' \
+               | sort -n)
+    echo -e "${EXERCISES_LIST}" > "${EXERCISE_LIST_FILE}"
+else
+    EXERCISES_LIST=$(cat ${EXERCISE_LIST_FILE})
+fi
+
+ACTION="$1"
+OPTION="$2"
+
+if [[ -z "$ACTION" || "$ACTION" == "status" ]]; then
+    show_exercise
+elif [[ "$ACTION" == "help" ]]; then
+    show_help
+elif [[ "$ACTION" == "check" ]]; then
+    check_exercise
+elif [[ "$ACTION" == "next" ]]; then
+    next_exercise
+elif [[ "$ACTION" == "prev" ]]; then
+    prev_exercise
+elif [[ "$ACTION" == "list" ]]; then
+    echo "$EXERCISES_LIST"
+else
+    EXERCISE=$(echo "${EXERCISES_LIST}" | grep -e "${ACTION} -" | cut -d ' ' -f1 | head -1)
+    if [[ "${EXERCISE}" != "" ]]; then
+        load_exercise "${EXERCISE}"
+    else
+        echo -e "$ACTION n'est pas un exercice disponible, voici la liste :\n${EXERCISES_LIST}"
+    fi
+fi

@@ -1,0 +1,12 @@
+---
+- name: "Install php packages"
+  apt:
+    name:
+      - php7.0
+      - libapache2-mod-php7.0
+      - php-mysql
+    state: latest
+    update_cache: True
+  notify:
+    - restart apache2
+...

@@ -1,0 +1,10 @@
+---
+- hosts: web
+  become: True
+  tasks:
+    - name: "Add user(s)"
+      user:
+        name: "user1"
+        uid: "2001"
+        state: "present"
+...

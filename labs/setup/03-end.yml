@@ -1,0 +1,8 @@
+---
+- hosts: node3
+  gather_facts: False
+  become: True
+  tasks:
+    - name: "Uninstall python"
+      raw: "apt -y update; apt -y install python3"
+...

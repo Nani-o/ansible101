@@ -1,0 +1,9 @@
+---
+- hosts: web
+  become: True
+  tasks:
+    - name: "Deploy motd file"
+      copy:
+        src: "motd"
+        dest: "/etc/"
+...

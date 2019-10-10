@@ -1,0 +1,15 @@
+---
+- hosts: web
+  become: True
+  tasks:
+    - name: "Install MySQL"
+      apt:
+        name: "mysql-server"
+        state: "latest"
+        update_cache: True
+
+    - name: "Uninstall MySQL"
+      apt:
+        name: "mysql-server"
+        state: "absent"
+...
