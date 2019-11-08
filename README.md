@@ -1,3 +1,5 @@
+<img alt="Docker Cloud Build Status" src="https://img.shields.io/docker/cloud/build/nanio/ansible101">
+
 # ansible101
 An ansible workshop that runs in docker.
 
